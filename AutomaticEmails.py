@@ -8,7 +8,7 @@ import smtplib
 import os
 
 #nba api
-url = "http://data.nba.net/10s/prod/v1/today.json"
+URL = "http://data.nba.net/10s/prod/v1/today.json"
 #https://www.quora.com/Is-there-an-NBA-API-for-free-that-has-live-stats
 def ReadUrl(url):
     #finds the website from the url
@@ -30,3 +30,33 @@ s.login('nbascores.py@gmail.com', 'rZwg2vAc')
 
 #pulling the data from the api
 #https://stackoverflow.com/questions/73028029/how-to-get-stats-games-of-a-specific-date-using-data-nba-net
+#today's Scoreboard
+file = "/prod/v1/20220912/scoreboard.json"
+
+def get_links(url, file):
+    data = requests.get(url + file).json()
+    links = data['links']
+    return links
+
+def get_scores(url, links):
+    scoreboard = links['currentScoreboard']
+    games = requests.get(url + scoreboard).json()['games']
+    scores = []
+    for g in games:
+        temp = ""
+        home = g['hTeam']
+        hscore = g[''] #Find the link for the scores
+        away = g['vTeam']
+        ascore = g[''] #find the link!!
+        if(hscore > ascore):
+            temp = home + ": " + hscore + "beat " + away + ": " + ascore"
+        else:
+            temp = away + ": " + ascore + "beat " + home + ": " + hscore"
+        scores.append(temp)
+     return scores
+
+
+            
+    
+    
+    
