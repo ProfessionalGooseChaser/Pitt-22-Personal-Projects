@@ -22,7 +22,6 @@ def ReadUrl(url):
 
     return soup
 
-#finds and formats yesterday's date so that I can find the correct directory
 def yesterday():
     yesterday = date.today() - timedelta(days=1)
     yyear = str(yesterday.year)
@@ -41,34 +40,48 @@ def yesterday():
 #pulling the data from the api
 #https://stackoverflow.com/questions/73028029/how-to-get-stats-games-of-a-specific-date-using-data-nba-net
 #today's Scoreboard
-FILE = "/20220410/scoreboard.json"
-
-#finds the correct json extension
+FILE = "/20220322/scoreboard.json"
 def find_file():
     return "/" + yesterday() + "/scoreboard.json"
 
-def get_links(url, file):
+def get_data(url, file):
     data = requests.get(url + file).json()
-    #links = data['links']
     return data
 
-def get_scores(url, links):
-    scoreboard = links['currentScoreboard']
-    games = requests.get(url + scoreboard).json()['games']
-    scores = []
-    for g in games:
-        temp = ""
-        home = g['hTeam']
-        hscore = g[''] #Find the link for the scores
-        away = g['vTeam']
-        ascore = g[''] #find the link!!
-        if(hscore > ascore):
-            temp = home + ": " + hscore + "beat " + away + ": " + ascore
-        else:
-            temp = away + ": " + ascore + "beat " + home + ": " + hscore
-        scores.append(temp)
-    return scores
+def get_scores(data):
+    gms = []
+    for i in data['games']:
+        gm = []
+        #separates games, each i is a game
+
+        #visting team info
+        gm.append(i['vTeam']['triCode'])
+        gm.append(i['vTeam']['win'])
+        gm.append(i['vTeam']['loss'])
+        gm.append(i['vTeam']['score'])
+
+        gm.append(i['hTeam']['triCode'])
+        gm.append(i['hTeam']['win'])
+        gm.append(i['hTeam']['loss'])
+        gm.append(i['hTeam']['score'])
+
+        gms.append(gm)
+    return gms
+
+
+print('\n' * 5)
+count = 0
+for i in get_scores(get_data(URL, FILE)):
+    print(i)
+    print('\n')
 
 
 
-    
+
+#finding games in json file
+#numgames: how many games were played that day
+#gameid: there's a unique identifier for each game
+#data from each game
+#tri code (GSW for golden state warriors)
+#Team Record
+#Score
