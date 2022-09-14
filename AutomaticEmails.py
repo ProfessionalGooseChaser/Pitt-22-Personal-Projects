@@ -1,6 +1,17 @@
 #Sending automatic email
-#from email import *
-#tried pip installing this class, can't access the subprocesses, ask for help
+#Uses a screen scraper and the data.nba.net api to send me daily emails of the nba scores from the night previous
+
+
+#https://www.geeksforgeeks.org/how-to-send-automated-email-messages-in-python/ ~ Sending automatic emails
+#https://www.geeksforgeeks.org/send-mail-gmail-account-using-python/ ~ sending emails with python
+
+#from email.mine.text import MINEText
+#from email.mine.image import MINEImage
+#from email.mine.multipart import MINEMultipart
+
+#tried pip installing this class, can't access the subprocesses
+#have setuptools, and the most recent version of pip already installed
+
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -8,6 +19,7 @@ import smtplib
 import os
 from datetime import date
 from datetime import timedelta
+from PIL import Image, ImageDraw, ImageFont
 
 #nba api
 URL = "http://data.nba.net/10s/prod/v1"
@@ -40,7 +52,7 @@ def yesterday():
 #pulling the data from the api
 #https://stackoverflow.com/questions/73028029/how-to-get-stats-games-of-a-specific-date-using-data-nba-net
 #today's Scoreboard
-FILE = "/20220322/scoreboard.json"
+FILE = "/20220410/scoreboard.json"
 def find_file():
     return "/" + yesterday() + "/scoreboard.json"
 
@@ -70,12 +82,9 @@ def get_scores(data):
 
 
 print('\n' * 5)
-count = 0
 for i in get_scores(get_data(URL, FILE)):
     print(i)
     print('\n')
-
-
 
 
 #finding games in json file
@@ -85,3 +94,42 @@ for i in get_scores(get_data(URL, FILE)):
 #tri code (GSW for golden state warriors)
 #Team Record
 #Score
+
+#create a dictionary with the tricodes of each team and a picture of their logo
+#pictures have different aspect ratios, find a way to scale them without losing their aspect ratio
+
+#the logos below usually include the team name... we can find different pngs so that we add the names ourselves or just add the names anyway
+NBAdict = {
+    "GSW" : ["Golden State Warriors", "GSW.png"],
+    "BOS" : ["Boston Celtics", "BOS.png"],
+    "LAL" : ["Los Angeles Lakers", "LAL.png"],
+    "BKN" : ["Brooklyn Nets", "BKN.png"],
+    "ATL" : ["Atlanta Hawks", "ATL.png"],
+    "MIL" : ["Milwaukee Bucks", "MIL.png"],
+    "CHI" : ["Chicago Bulls", "CHI.png"],
+    "DET" : ["Detroit Pistons", "DET.png"],
+    "DAL" : ["Dallas Mavericks", "DAL.png"],
+    "WAS" : ["Washington Wizards", "WAS.png"],
+    "NYK" : ["New York Knicks", "NYK.png"],
+    "NOP" : ["New Orleans Pelicans", "NOP.png"],
+    "PHI" : ["Philidelphi 76ers", "PHI.png"],
+    "TOR" : ["Toronto Raptors", "TOR.png"],
+    "MIA" : ["Miami Heat", "MIA.png"], 
+    "CLE" : ["Cleveland Cavaliers", "CLE.png"],
+    "MEM" : ["Memphis Grizzlies", "MEM.png"],
+    "PHX" : ["Pheonix Suns", "PHX.png"],
+    "OKC" : ["Oklahoma City Thunder", "OKC.png"],
+    "SAS" : ["San Antonio Spurs", "SAS.png"],
+    "MIN" : ["Minnesota Timberwolves", "MIN.png"],
+    "UTA" : ["Utah Jazz", "UTA.png"],
+    "SAC" : ["Sacremento Kings", "SAC.png"],
+    "HOU" : ["Houston Rockets", "HOU.png"],
+    "LAC" : ["Los Angeles Clippers", "LAC.png"],
+    "ORL" : ["Orlando Magic", "ORL.png"],
+    "POR" : ["Portland Trailblazers", "POR.png"],
+    "DEN" : ["Denver Nuggets", "DEN.png"],
+    "CHA" : ["Charlotte Hornets", "CHA.png"],
+    "IND" : ["Indiana Pacers", "IND.png"]
+}
+
+print(len(NBAdict))
