@@ -132,4 +132,33 @@ NBAdict = {
     "IND" : ["Indiana Pacers", "IND.png"]
 }
 
-print(len(NBAdict))
+def create_graphic(games):
+    #creates an off-white background of 720 x 720  pixels
+    WIDTH = 720
+    bg = Image.new('RGB', (WIDTH, len(games) * 200), color= (245, 245, 245))
+    count = 0
+    for i in games:
+        center = (count * 200)
+        h_logo = Image.open(resize(NBAdict[i[0]][1])) #hteam logo
+        bg.paste(h_logo, (center + 36, 36), h_logo)
+
+        #add team name
+        #add team record
+        #won/lost
+        #score
+        #to
+        
+        v_logo = Image.open(resize(NBAdict[i[4]][1])) # vteam logo
+        bg.paste(v_logo, (center + 36, WIDTH/2 + 36), h_logo) #may need to adjust this y value
+        #add team name
+        #add team record
+
+        count += 1
+    
+    bg.save(yesterday() + ".png")
+
+def resize(img):
+    return img.thumbnail((128, 128))
+
+
+#print(len(NBAdict))
