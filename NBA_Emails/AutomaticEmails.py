@@ -67,24 +67,19 @@ def get_scores(data):
         #separates games, each i is a game
 
         #visting team info
-        gm.append(i['vTeam']['triCode'])
-        gm.append(i['vTeam']['win'])
-        gm.append(i['vTeam']['loss'])
-        gm.append(i['vTeam']['score'])
+        gm.append(i['vTeam']['triCode'])    #0
+        gm.append(i['vTeam']['win'])        #1
+        gm.append(i['vTeam']['loss'])       #2
+        gm.append(i['vTeam']['score'])      #3
 
-        gm.append(i['hTeam']['triCode'])
-        gm.append(i['hTeam']['win'])
-        gm.append(i['hTeam']['loss'])
-        gm.append(i['hTeam']['score'])
+        gm.append(i['hTeam']['triCode'])    #4
+        gm.append(i['hTeam']['win'])        #5
+        gm.append(i['hTeam']['loss'])       #6
+        gm.append(i['hTeam']['score'])      #7
 
         gms.append(gm)
     return gms
 
-
-print('\n' * 5)
-for i in get_scores(get_data(URL, FILE)):
-    print(i)
-    print('\n')
 
 
 #finding games in json file
@@ -133,32 +128,54 @@ NBAdict = {
 }
 
 def create_graphic(games):
-    #creates an off-white background of 720 x 720  pixels
+    #creates an off-white background of 720 x ___ pixels
     WIDTH = 720
     bg = Image.new('RGB', (WIDTH, len(games) * 200), color= (245, 245, 245))
     count = 0
+    
     for i in games:
         center = (count * 200)
         h_logo = Image.open(resize(NBAdict[i[0]][1])) #hteam logo
-        bg.paste(h_logo, (center + 36, 36), h_logo)
+        bg.paste(h_logo, (36, center + 36), h_logo)
+        bg.paste(v_logo, (WIDTH/2 + 36, center + 36), v_logo) 
 
-        #add team name
-        #add team record
-        #won/lost
-        #score
-        #to
+        bg = ImageDraw.Draw(bg)
+        bg.text((200, center + 100), NBAdict[i[0]][0], fill=(255, 255, 255)) #add team name
+        bg.text((275, center + 100), WL_record(i, True), fill = (255, 255, 255))#add team record
+        if(i[3] > i[7]):#won/lost
+            bg.text((310, center + 100), "Won", fill = (255, 255, 255))
+        else:
+            bg.text((310, center + 100), "Lost", fill = (255, 255, 255))
+
+        bg.text((325, center + 100), findScore(i) + " to", fill = (255, 255, 255)) # the score
+        
         
         v_logo = Image.open(resize(NBAdict[i[4]][1])) # vteam logo
-        bg.paste(v_logo, (center + 36, WIDTH/2 + 36), h_logo) #may need to adjust this y value
-        #add team name
-        #add team record
-
+        #may need to adjust this y value
+        bg.text((WIDTH/2 + 200, center + 100), NBAdict[i[4]][0], fill=(255, 255, 255))#add team name
+        bg.text((WIDTH/2 + 250, center + 100), WL_record(i, True), fill = (255, 255, 255))#add team record
+        
         count += 1
     
-    bg.save(yesterday() + ".png")
+    bg.save(str(yesterday()) + ".png")
+    return bg
 
-def resize(img):
-    return img.thumbnail((128, 128))
+def resize(IMAGE):
+    img = Image.open("NBA_Logos/" + IMAGE)
+    img.thumbnail((128, 128))
+    img.save("n" + IMAGE)
+    return img
+
+def WL_record(game, HorA):
+    if(HorA):
+        return str(game[1]) + " - " + str(game[2])
+    else:
+        return str(game[5]) + " - " + str(game[6])
+
+def findScore(game):
+    return str(game[3]) + " - " + str(game[7])
+    
+create_graphic(get_scores(get_data(URL, FILE))).show()
 
 
 #print(len(NBAdict))
