@@ -35,7 +35,7 @@ def ReadUrl(url):
     return soup
 
 def yesterday():
-    yesterday = date.today() - timedelta(days=1)
+    yesterday = date.today() - timedelta(days=2)
     yyear = str(yesterday.year)
     ymonth = str(yesterday.month)
     if(len(ymonth)== 1):
@@ -130,40 +130,47 @@ NBAdict = {
 def create_graphic(games):
     #creates an off-white background of 720 x ___ pixels
     WIDTH = 720
-    bg = Image.new('RGB', (WIDTH, len(games) * 200), color= (245, 245, 245))
+    bgO = Image.new('RGB', (WIDTH, len(games) * 200), color= (245, 245, 245))
     count = 0
-    
+    bg = ImageDraw.Draw(bgO)
+    FONT = ImageFont.truetype("Monaco.ttf", 10)
+
     for i in games:
+        print(i)
         center = (count * 200)
-        h_logo = Image.open(resize(NBAdict[i[0]][1])) #hteam logo
-        bg.paste(h_logo, (36, center + 36), h_logo)
-        bg.paste(v_logo, (WIDTH/2 + 36, center + 36), v_logo) 
+        h_logo = resize(NBAdict[i[0]][1]) #hteam logo
+        width1, height1 = h_logo.size
+        bgO.paste(h_logo, (int((160 - width1)/2), int(center + height1/2)))
 
-        bg = ImageDraw.Draw(bg)
-        bg.text((200, center + 100), NBAdict[i[0]][0], fill=(255, 255, 255)) #add team name
-        bg.text((275, center + 100), WL_record(i, True), fill = (255, 255, 255))#add team record
+        v_logo = resize(NBAdict[i[4]][1]) # vteam logo
+        width2, height2 = v_logo.size
+        bgO.paste(v_logo, (int((320 + width2 + WIDTH/2)/2), int(center + height2/2)))
+
+
+        bg.text((160, center + 100), NBAdict[i[0]][0], fill="black", font = FONT) #add team name
+        bg.text((200, center + 125), WL_record(i, True), fill = "black", font = FONT)#add team record
         if(i[3] > i[7]):#won/lost
-            bg.text((310, center + 100), "Won", fill = (255, 255, 255))
+            bg.text((290, center + 100), "Won", fill = "black", font = FONT)
         else:
-            bg.text((310, center + 100), "Lost", fill = (255, 255, 255))
+            bg.text((290, center + 100), "Lost", fill = "black", font = FONT)
 
-        bg.text((325, center + 100), findScore(i) + " to", fill = (255, 255, 255)) # the score
+        bg.text((320, center + 100), findScore(i) + " to", fill = "black", font = FONT) # the score
         
         
-        v_logo = Image.open(resize(NBAdict[i[4]][1])) # vteam logo
         #may need to adjust this y value
-        bg.text((WIDTH/2 + 200, center + 100), NBAdict[i[4]][0], fill=(255, 255, 255))#add team name
-        bg.text((WIDTH/2 + 250, center + 100), WL_record(i, True), fill = (255, 255, 255))#add team record
+        bg.text((WIDTH/2 + 190, center + 100), NBAdict[i[4]][0], fill="black", font = FONT)#add team name
+        bg.text((WIDTH/2 + 230, center + 125), WL_record(i, False), fill = "black", font = FONT)#add team record
         
         count += 1
     
-    bg.save(str(yesterday()) + ".png")
-    return bg
+    #bg.save(str(yesterday()) + ".png")
+    bgO.show()
+    #bgO.save("testing2.png")
+    
 
 def resize(IMAGE):
     img = Image.open("NBA_Logos/" + IMAGE)
     img.thumbnail((128, 128))
-    img.save("n" + IMAGE)
     return img
 
 def WL_record(game, HorA):
@@ -175,7 +182,9 @@ def WL_record(game, HorA):
 def findScore(game):
     return str(game[3]) + " - " + str(game[7])
     
-create_graphic(get_scores(get_data(URL, FILE))).show()
+create_graphic(get_scores(get_data(URL, FILE)))
 
+#print(get_scores(get_data(URL, find_file())))
 
 #print(len(NBAdict))
+
