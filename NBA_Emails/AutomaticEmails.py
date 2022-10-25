@@ -5,16 +5,12 @@
 #https://www.geeksforgeeks.org/how-to-send-automated-email-messages-in-python/ ~ Sending automatic emails
 #https://www.geeksforgeeks.org/send-mail-gmail-account-using-python/ ~ sending emails with python
 
-#from email.mine.text import MINEText
-#from email.mine.image import MINEImage
-#from email.mine.multipart import MINEMultipart
-
-#tried pip installing this class, can't access the subprocesses
-#have setuptools, and the most recent version of pip already installed
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 
 import requests
 from bs4 import BeautifulSoup
-import json
 import smtplib
 import os
 from datetime import date
@@ -44,10 +40,6 @@ def yesterday():
     return yyear + ymonth + yday
 
 #initiaing the email connection and logging in
-#s = smtplib.SMTP('smtp.gmail.com', 587)
-#s.ehlo()
-#s.starttls()
-#s.login('nbascores.py@gmail.com', 'rZwg2vAc')
 
 #pulling the data from the api
 #https://stackoverflow.com/questions/73028029/how-to-get-stats-games-of-a-specific-date-using-data-nba-net
@@ -163,9 +155,8 @@ def create_graphic(games):
         
         count += 1
     
-    #bg.save(str(yesterday()) + ".png")
     bgO.show()
-    #bgO.save("testing2.png")
+    bgO.save(str(yesterday()) + ".png")
     
 
 def resize(IMAGE):
@@ -182,9 +173,48 @@ def WL_record(game, HorA):
 def findScore(game):
     return str(game[3]) + " - " + str(game[7])
     
-create_graphic(get_scores(get_data(URL, FILE)))
+#create_graphic(get_scores(get_data(URL, FILE)))
 
 #print(get_scores(get_data(URL, find_file())))
 
 #print(len(NBAdict))
 
+#initializing the connection to the server
+sender = 'nbascores.py@gmail.com'
+
+s = smtplib.SMTP('smtp.gmail.com', 587)
+s.ehlo()
+s.starttls()
+
+#logging into my gmail
+password = 'fuqwmuapsoicaqci'
+s.login(sender, password)
+
+#https://www.geeksforgeeks.org/how-to-send-automated-email-messages-in-python/
+def message(subject = "", text = "", img = str(yesterday()) + '.png'):
+    
+    #initializes the email
+    msg = MIMEMultipart()
+
+    #writes the subject
+    msg['Subject'] = subject
+
+    #adds text (there shouldn't be any)
+    msg.attach(MIMEText(text))
+
+    create_graphic(get_scores(get_data(URL, FILE)))
+
+    img_data = open(img, 'rb').read()
+    msg.attach(MIMEImage(img_data)) #I shouldn't need to save and then open again. I did in fact have to save and reopen again
+
+    return msg
+
+#writes the message
+DailyMail = message(yesterday())
+
+#sends the message
+MailingList = ['Cole.r.hansen22@gmail.com']
+s.sendmail(from_addr=sender, to_addrs=MailingList, msg=DailyMail.as_string())
+
+#breaks the connection to the server
+s.quit()
