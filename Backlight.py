@@ -1,5 +1,6 @@
 from PIL import ImageGrab
 import time
+from multiprocessing import Process
 
 start = time.time()
 
@@ -24,14 +25,25 @@ class light():
                 print(x, y)
         self.rgb = tuple(ti/(self.rangeX * self.rangeY) for ti in totalRGB)
 
+SCREEN = (1440, 900)
+PERIMETER = 1440 * 2 + 900 * 2
+lights = []
 
+for i in range(16): #90pixels for range 
+    temp = light(i*90, 0, 90, 25) #top row
+    lights.append(temp)
+    temp2 = light(i*90, 1415, 90, 25) #bottom row
+    lights.append(temp2)
 
-temp = light(0, 0, 100, 100) # Is creating the object causing the 0.39 time?
-temp2 = light(0, 0, 100, 100)
-temp.average()
-temp2.average()
-print(temp.rgb)
-print(temp2.rgb)
+for j in range(10):
+    temp = light(0, j*90, 25, 90) #Left side
+    lights.append(temp)
+    temp2 = light(875, j*90, 25, 90)
+    lights.append(temp2) #right side
+
+#Using processes to optimize
+#creating a process for each light object
+processes = []
 
 end = time.time()
 print(str(end-start))
@@ -41,3 +53,5 @@ print(str(end-start))
 #10k - 0.78s
 #1k - 0.4s
 #100 - 0.4s
+
+#some notes, I'm not too worried about time rn. I do want to eventually use parallelt processing to update all of the lights at onces
